@@ -33,6 +33,7 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
     const script = document.createElement('script');
     script.src = 'https://assets.calendly.com/assets/external/widget.js';
     script.async = true;
+    script.defer = true;
     script.onload = () => {
       console.log('Calendly script loaded successfully');
     };
@@ -147,12 +148,10 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
             return;
           }
 
-          // Use Calendly's preferred initialization method
-          window.Calendly.createInlineWidget({
+          // Use Calendly's inline embed code initialization
+          window.Calendly.initInlineWidget({
             url: 'https://calendly.com/sovanza/30min',
             parentElement,
-            prefill: {},
-            utm: {}
           });
           console.log('Calendly widget initialized successfully');
           // Set loaded state after initialization
@@ -198,7 +197,6 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
           <div 
             id="calendly-container"
             className={`calendly-inline-widget ${!isCalendlyLoaded ? 'opacity-0' : 'opacity-100'}`}
-            data-url="https://calendly.com/sovanza/30min"
             style={{ 
               minWidth: '320px',
               width: '100%',
