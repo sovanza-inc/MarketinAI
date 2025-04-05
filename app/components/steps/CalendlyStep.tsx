@@ -140,9 +140,16 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
       console.log('Initializing Calendly widget...');
       if (window.Calendly) {
         try {
+          const parentElement = document.querySelector('.calendly-inline-widget');
+          if (!parentElement) {
+            console.error('Calendly parent element not found, retrying in 100ms...');
+            setTimeout(initCalendly, 100);
+            return;
+          }
+
           window.Calendly.initInlineWidget({
             url: 'https://calendly.com/sovanza/30min',
-            parentElement: document.querySelector('.calendly-inline-widget'),
+            parentElement,
             prefill: {},
             utm: {}
           });
@@ -187,6 +194,7 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
         <div className="relative">
           {!isCalendlyLoaded && <LoadingSpinner />}
           <div 
+            id="calendly-container"
             className={`calendly-inline-widget ${!isCalendlyLoaded ? 'opacity-0' : 'opacity-100'}`}
             style={{ 
               minWidth: '320px',
