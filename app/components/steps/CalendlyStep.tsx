@@ -140,14 +140,15 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
       console.log('Initializing Calendly widget...');
       if (window.Calendly) {
         try {
-          const parentElement = document.querySelector('.calendly-inline-widget');
+          const parentElement = document.getElementById('calendly-container');
           if (!parentElement) {
             console.error('Calendly parent element not found, retrying in 100ms...');
             setTimeout(initCalendly, 100);
             return;
           }
 
-          window.Calendly.initInlineWidget({
+          // Use Calendly's preferred initialization method
+          window.Calendly.createInlineWidget({
             url: 'https://calendly.com/sovanza/30min',
             parentElement,
             prefill: {},
@@ -170,7 +171,8 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
     // Check if Calendly is already loaded
     if (window.Calendly) {
       console.log('Calendly already available, initializing...');
-      initCalendly();
+      // Add a small delay to ensure DOM is ready
+      setTimeout(initCalendly, 100);
     } else {
       console.log('Waiting for Calendly to load...');
       // If not loaded, wait for script to load
@@ -196,6 +198,7 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
           <div 
             id="calendly-container"
             className={`calendly-inline-widget ${!isCalendlyLoaded ? 'opacity-0' : 'opacity-100'}`}
+            data-url="https://calendly.com/sovanza/30min"
             style={{ 
               minWidth: '320px',
               width: '100%',
@@ -203,7 +206,7 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
               overflow: 'hidden',
               transition: 'opacity 0.3s ease-in-out'
             }} 
-          />
+          ></div>
         </div>
         {isScheduled && (
           <p className="text-green-600 text-center font-medium">
