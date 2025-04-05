@@ -28,24 +28,57 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
   const [isCalendlyLoaded, setIsCalendlyLoaded] = useState(false);
 
   useEffect(() => {
+    console.log('Starting to load Calendly script...');
     // Load Calendly widget script
     const script = document.createElement('script');
     script.src = 'https://assets.calendly.com/assets/external/widget.js';
     script.async = true;
+    script.onload = () => {
+      console.log('Calendly script loaded successfully');
+    };
+    script.onerror = (error) => {
+      console.error('Error loading Calendly script:', error);
+    };
     document.body.appendChild(script);
 
     // Load Calendly CSS
     const link = document.createElement('link');
     link.href = 'https://assets.calendly.com/assets/external/widget.css';
     link.rel = 'stylesheet';
+    link.onload = () => {
+      console.log('Calendly CSS loaded successfully');
+    };
+    link.onerror = (error) => {
+      console.error('Error loading Calendly CSS:', error);
+    };
     document.head.appendChild(link);
 
     // Add Calendly event listener
     const handleCalendlyEvent = (e: any) => {
+      console.log('Received message event:', e.data);
+      
+      if (!e.data) {
+        console.error('No event data received');
+        return;
+      }
+
+      if (e.data.event && e.data.event.indexOf('calendly.') === 0) {
+        console.log('Calendly event received:', e.data.event);
+      }
+
       if (e.data.event === 'calendly.event_scheduled') {
         try {
+          console.log('Calendly event scheduled:', e.data.payload);
+          
+          if (!e.data.payload || !e.data.payload.event) {
+            throw new Error('Invalid event payload structure');
+          }
+
           const eventDetails = e.data.payload.event;
+          console.log('Event details:', eventDetails);
+          
           const startTime = eventDetails.start_time || eventDetails.startTime;
+          console.log('Start time:', startTime);
           
           if (!startTime) {
             throw new Error('No start time provided in event payload');
@@ -72,13 +105,16 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
           });
 
           const formattedDateTime = `${formattedDate} at ${formattedTime}`;
+          console.log('Formatted date time:', formattedDateTime);
 
           setValue('startTime', formattedDateTime, { shouldValidate: true });
           setScheduledTime(formattedDateTime);
           setIsScheduled(true);
         } catch (error) {
           console.error('Error handling Calendly event:', error);
+          // Set a fallback value to allow form submission
           setValue('startTime', 'Scheduled - Check your email for details', { shouldValidate: true });
+          setIsScheduled(true);
         }
       }
     };
@@ -87,6 +123,7 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
 
     // Cleanup
     return () => {
+      console.log('Cleaning up Calendly resources...');
       window.removeEventListener('message', handleCalendlyEvent);
       if (document.body.contains(script)) {
         document.body.removeChild(script);
@@ -100,25 +137,39 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
   useEffect(() => {
     // Initialize Calendly widget after script loads
     const initCalendly = () => {
+      console.log('Initializing Calendly widget...');
       if (window.Calendly) {
-        window.Calendly.initInlineWidget({
-          url: 'https://calendly.com/sovanza/30min',
-          parentElement: document.querySelector('.calendly-inline-widget'),
-          prefill: {},
-          utm: {}
-        });
-        // Set loaded state after initialization
-        setTimeout(() => setIsCalendlyLoaded(true), 1000);
+        try {
+          window.Calendly.initInlineWidget({
+            url: 'https://calendly.com/sovanza/30min',
+            parentElement: document.querySelector('.calendly-inline-widget'),
+            prefill: {},
+            utm: {}
+          });
+          console.log('Calendly widget initialized successfully');
+          // Set loaded state after initialization
+          setTimeout(() => {
+            setIsCalendlyLoaded(true);
+            console.log('Calendly widget marked as loaded');
+          }, 1000);
+        } catch (error) {
+          console.error('Error initializing Calendly widget:', error);
+        }
+      } else {
+        console.error('Calendly not available for initialization');
       }
     };
 
     // Check if Calendly is already loaded
     if (window.Calendly) {
+      console.log('Calendly already available, initializing...');
       initCalendly();
     } else {
+      console.log('Waiting for Calendly to load...');
       // If not loaded, wait for script to load
       const timer = setInterval(() => {
         if (window.Calendly) {
+          console.log('Calendly detected, initializing...');
           initCalendly();
           clearInterval(timer);
         }
