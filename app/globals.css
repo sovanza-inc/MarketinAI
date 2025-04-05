@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #FF0033;
+  --primary-dark: #CC0029;
+  --text-dark: #1A1A1A;
+  --text-light: #666666;
+  --background: #FFFFFF;
+  --gray-light: #F5F5F5;
+}
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply font-sans text-text-dark bg-background;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold;
+  }
+
+  h1 {
+    @apply text-h1 mb-6;
+  }
+
+  h2 {
+    @apply text-h2 mb-4;
+  }
+
+  h3 {
+    @apply text-h3 mb-3;
+  }
+
+  p {
+    @apply text-body text-text-light mb-4;
+  }
+
+  button {
+    @apply transition-all duration-200;
+  }
+
+  button:hover {
+    @apply transform scale-[1.02];
+  }
+
+  input, select, textarea {
+    @apply border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent;
+  }
+}
+
+@layer components {
+  .container {
+    @apply mx-auto max-w-container px-4;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-xl font-medium transition-all duration-200;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary text-white hover:bg-primary-dark;
+  }
+
+  .btn-outline {
+    @apply btn border-2 border-primary text-primary hover:bg-primary hover:text-white;
+  }
+
+  .section {
+    @apply py-section;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-card p-6;
+  }
+
+  .nav-link {
+    @apply text-text-dark hover:text-primary transition-colors;
+  }
+}
+
+/* Custom animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  :root {
+    --section-spacing: 4rem;
+  }
+
+  h1 {
+    @apply text-4xl;
+  }
+
+  h2 {
+    @apply text-3xl;
+  }
+
+  h3 {
+    @apply text-2xl;
+  }
+} 

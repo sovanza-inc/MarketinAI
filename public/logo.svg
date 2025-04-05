@@ -1,0 +1,5 @@
+<svg width="120" height="32" viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M10 8L18 16L10 24" stroke="#FF0033" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M2 16H18" stroke="#FF0033" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="28" y="22" font-family="Inter" font-weight="600" font-size="18" fill="#1A1A1A">AI Marketing</text>
+</svg> 
