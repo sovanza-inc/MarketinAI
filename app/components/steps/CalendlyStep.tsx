@@ -45,14 +45,14 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
         try {
           console.log('Calendly event scheduled:', e.data.payload);
           
-          if (!e.data.payload || !e.data.payload.event) {
+          if (!e.data.payload || !e.data.payload.invitee) {
             throw new Error('Invalid event payload structure');
           }
 
-          const eventDetails = e.data.payload.event;
+          const eventDetails = e.data.payload;
           console.log('Event details:', eventDetails);
           
-          const startTime = eventDetails.start_time || eventDetails.startTime;
+          const startTime = eventDetails.invitee.start_time || eventDetails.event.start_time;
           console.log('Start time:', startTime);
           
           if (!startTime) {
@@ -67,14 +67,14 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
 
           // Format date in a simpler format
           const formattedDate = scheduledDate.toLocaleDateString('en-US', {
-            month: 'short',
+            month: 'long',
             day: 'numeric',
             year: 'numeric'
           });
 
           // Format time separately
           const formattedTime = scheduledDate.toLocaleTimeString('en-US', {
-            hour: '2-digit',
+            hour: 'numeric',
             minute: '2-digit',
             hour12: true
           });
