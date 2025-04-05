@@ -43,20 +43,32 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
 
       if (e.data.event === 'calendly.event_scheduled') {
         try {
-          console.log('Calendly event scheduled:', e.data.payload);
+          console.log('Full Calendly event payload:', JSON.stringify(e.data, null, 2));
           
-          if (!e.data.payload || !e.data.payload.invitee) {
-            throw new Error('Invalid event payload structure');
+          const payload = e.data.payload;
+          if (!payload) {
+            throw new Error('No payload in event data');
           }
 
-          const eventDetails = e.data.payload;
-          console.log('Event details:', eventDetails);
-          
-          const startTime = eventDetails.invitee.start_time || eventDetails.event.start_time;
-          console.log('Start time:', startTime);
+          console.log('Checking event payload structure:', {
+            hasEvent: !!payload.event,
+            hasInvitee: !!payload.invitee,
+            hasScheduling: !!payload.scheduling,
+            eventStartTime: payload.event?.start_time,
+            inviteeStartTime: payload.invitee?.start_time,
+            schedulingStartTime: payload.scheduling?.start_time
+          });
+
+          // Try different possible locations for the start time
+          const startTime = 
+            payload.scheduling?.start_time || 
+            payload.event?.start_time || 
+            payload.invitee?.start_time;
+
+          console.log('Found start time:', startTime);
           
           if (!startTime) {
-            throw new Error('No start time provided in event payload');
+            throw new Error('No start time found in any payload location');
           }
 
           const scheduledDate = new Date(startTime);
@@ -80,7 +92,7 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
           });
 
           const formattedDateTime = `${formattedDate} at ${formattedTime}`;
-          console.log('Formatted date time:', formattedDateTime);
+          console.log('Final formatted date time:', formattedDateTime);
 
           setValue('startTime', formattedDateTime, { shouldValidate: true });
           setScheduledTime(formattedDateTime);
