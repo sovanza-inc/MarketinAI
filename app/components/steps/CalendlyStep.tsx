@@ -28,32 +28,6 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
   const [isCalendlyLoaded, setIsCalendlyLoaded] = useState(false);
 
   useEffect(() => {
-    console.log('Starting to load Calendly script...');
-    // Load Calendly widget script
-    const script = document.createElement('script');
-    script.src = 'https://assets.calendly.com/assets/external/widget.js';
-    script.async = true;
-    script.defer = true;
-    script.onload = () => {
-      console.log('Calendly script loaded successfully');
-    };
-    script.onerror = (error) => {
-      console.error('Error loading Calendly script:', error);
-    };
-    document.body.appendChild(script);
-
-    // Load Calendly CSS
-    const link = document.createElement('link');
-    link.href = 'https://assets.calendly.com/assets/external/widget.css';
-    link.rel = 'stylesheet';
-    link.onload = () => {
-      console.log('Calendly CSS loaded successfully');
-    };
-    link.onerror = (error) => {
-      console.error('Error loading Calendly CSS:', error);
-    };
-    document.head.appendChild(link);
-
     // Add Calendly event listener
     const handleCalendlyEvent = (e: any) => {
       console.log('Received message event:', e.data);
@@ -122,69 +96,24 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
 
     window.addEventListener('message', handleCalendlyEvent);
 
-    // Cleanup
+    // Load Calendly script
+    const head = document.head;
+    const script = document.createElement('script');
+    script.src = "https://assets.calendly.com/assets/external/widget.js";
+    script.async = true;
+    script.onload = () => {
+      console.log('Calendly script loaded');
+      setIsCalendlyLoaded(true);
+    };
+    head.appendChild(script);
+
     return () => {
-      console.log('Cleaning up Calendly resources...');
       window.removeEventListener('message', handleCalendlyEvent);
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-      if (document.head.contains(link)) {
-        document.head.removeChild(link);
+      if (head.contains(script)) {
+        head.removeChild(script);
       }
     };
   }, [setValue]);
-
-  useEffect(() => {
-    // Initialize Calendly widget after script loads
-    const initCalendly = () => {
-      console.log('Initializing Calendly widget...');
-      if (window.Calendly) {
-        try {
-          const parentElement = document.getElementById('calendly-container');
-          if (!parentElement) {
-            console.error('Calendly parent element not found, retrying in 100ms...');
-            setTimeout(initCalendly, 100);
-            return;
-          }
-
-          // Use Calendly's inline embed code initialization
-          window.Calendly.initInlineWidget({
-            url: 'https://calendly.com/sovanza/30min',
-            parentElement,
-          });
-          console.log('Calendly widget initialized successfully');
-          // Set loaded state after initialization
-          setTimeout(() => {
-            setIsCalendlyLoaded(true);
-            console.log('Calendly widget marked as loaded');
-          }, 1000);
-        } catch (error) {
-          console.error('Error initializing Calendly widget:', error);
-        }
-      } else {
-        console.error('Calendly not available for initialization');
-      }
-    };
-
-    // Check if Calendly is already loaded
-    if (window.Calendly) {
-      console.log('Calendly already available, initializing...');
-      // Add a small delay to ensure DOM is ready
-      setTimeout(initCalendly, 100);
-    } else {
-      console.log('Waiting for Calendly to load...');
-      // If not loaded, wait for script to load
-      const timer = setInterval(() => {
-        if (window.Calendly) {
-          console.log('Calendly detected, initializing...');
-          initCalendly();
-          clearInterval(timer);
-        }
-      }, 100);
-      return () => clearInterval(timer);
-    }
-  }, []);
 
   return (
     <FormStep
@@ -195,16 +124,22 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
         <div className="relative">
           {!isCalendlyLoaded && <LoadingSpinner />}
           <div 
-            id="calendly-container"
-            className={`calendly-inline-widget ${!isCalendlyLoaded ? 'opacity-0' : 'opacity-100'}`}
+            className={`${!isCalendlyLoaded ? 'opacity-0' : 'opacity-100'}`}
             style={{ 
-              minWidth: '320px',
-              width: '100%',
-              height: '700px',
-              overflow: 'hidden',
               transition: 'opacity 0.3s ease-in-out'
-            }} 
-          ></div>
+            }}
+          >
+            {/* Calendly inline widget embed code */}
+            <div 
+              className="calendly-inline-widget" 
+              data-url="https://calendly.com/sovanza/30min"
+              style={{ 
+                minWidth: '320px',
+                width: '100%',
+                height: '700px',
+              }}
+            ></div>
+          </div>
         </div>
         {isScheduled && (
           <p className="text-green-600 text-center font-medium">
