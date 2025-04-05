@@ -155,7 +155,7 @@ const CalendlyStep: React.FC<CalendlyStepProps> = ({ form }) => {
         </div>
         {isScheduled && (
           <p className="text-green-600 text-center font-medium">
-            ✓ Consultation scheduled successfully for {scheduledTime}!
+            ✓ Consultation scheduled successfully!
           </p>
         )}
       </div>
